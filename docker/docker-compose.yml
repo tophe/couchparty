@@ -1,0 +1,20 @@
+version: "2.1"
+services:
+  couchdb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: couchdbparty:latest
+    container_name: couchdb
+    environment:
+      - TZ=Europe/Paris
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+    #      - CONTEXT_PATH=<URL_BASE> #optional
+    #      - JAVA_OPTS=<options> #optional
+    volumes:
+      - ./data:/opt/couchdb/data
+    ports:
+      - 5984:5984
+    restart: unless-stopped
+

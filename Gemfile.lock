@@ -1,0 +1,55 @@
+PATH
+  remote: .
+  specs:
+    couchparty (0.5.0)
+      httpx
+      mime-types
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.5.0)
+    hashdiff (1.0.1)
+    http-2-next (0.5.0)
+    httpx (0.19.2)
+      http-2-next (>= 0.4.1)
+    mime-types (3.4.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2022.0105)
+    public_suffix (4.0.6)
+    rake (10.5.0)
+    rexml (3.2.5)
+    rspec (3.11.0)
+      rspec-core (~> 3.11.0)
+      rspec-expectations (~> 3.11.0)
+      rspec-mocks (~> 3.11.0)
+    rspec-core (3.11.0)
+      rspec-support (~> 3.11.0)
+    rspec-expectations (3.11.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.11.0)
+    rspec-mocks (3.11.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.11.0)
+    rspec-support (3.11.0)
+    webmock (3.14.0)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  couchparty!
+  rake (< 11.0)
+  rspec
+  webmock
+
+BUNDLED WITH
+   2.3.6
