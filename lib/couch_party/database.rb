@@ -109,8 +109,23 @@ module CouchParty
       uri
     end
 
+    # docs : array of simple {} or Document, in a {} need _id and _rev if an update is needed.
+    # return couch response
+    def bulk_docs(docs, options: {})
+      allowed_options = %w'new_edits'
+
+      options = JSON.parse(options.to_json)
+
+      options.keys.each do |option|
+        raise "Error option : #{option} not allowed in buld_docs" unless allowed_options.include?(option)
+      end
+      docs = {'docs' => docs}
+      @server.process_query(method: :post, uri: uri + '_bulk_docs', options: options, json: docs)
+
+    end
 
     # save a document
+    # doc can be a simple {}
     # batch: 'ok' to store in batch mode
     # if no _id in doc, the uuid if inserted from _uuids
     def save_doc(doc, batch: nil)

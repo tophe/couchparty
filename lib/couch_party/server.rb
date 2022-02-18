@@ -15,7 +15,7 @@ module CouchParty
                       .with_headers("Accept" => "application/json")
                       .with_headers("User-Agent" => "CouchParty/#{CouchParty::VERSION}")
       # debug purpose
-      # .plugin(:proxy).with_proxy(uri: 'http://localhost:8888')
+                      .plugin(:proxy).with_proxy(uri: 'http://localhost:8888')
       if ENV.has_key?('HTTP_PROXY')
           @session = @session.plugin(:proxy).with_proxy(uri: ENV['HTTP_PROXY'])
       end

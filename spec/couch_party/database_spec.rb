@@ -126,7 +126,11 @@ describe CouchParty::Database do
       info = db.info
       expect(info['db_name']).to eq(TESTDB)
     end
+
+
   end
+
+
 
   describe :index do
     it "should list indexes" do
