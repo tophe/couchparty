@@ -9,13 +9,15 @@ module CouchParty
     end
 
     # post _find
-    def find(json: , options: {})
+    # json : send in body calling .to_json
+    def find(json , options: {})
       body_params = %w'selector limit skip sort fields use_index conflicts r bookmark update stable stale execution_stats'
+      json = JSON.parse(json.to_json)
       json.each_key do |k|
         raise "selector : #{k} not permited " unless body_params.include?(k)
       end
 
-      @server.process_query(method: :post, uri: uri + '_find', options: options, json: json )
+      @server.process_query(method: :post, uri: uri + '_find', options: options, json: json)
     end
 
 

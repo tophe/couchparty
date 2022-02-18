@@ -13,11 +13,11 @@ require 'couch_party/design'
 require 'couch_party/attachment'
 require 'couch_party/couch_error'
 
-puts 'Relax couchparty loaded!'
+
 
 
 module CouchParty
-
+  puts "Relax couchparty v#{VERSION} loaded!"
   class << self
 
 
@@ -26,9 +26,9 @@ module CouchParty
       CouchParty::Server.new(url: url, name: name, password: password ,logger: logger)
     end
 
-    def database(url: ,db: )
-      server = CouchParty::Server.new(url: url, db: db)
-      CouchParty.Database.new(server: server, db: db)
+    def database(url: , db:, name: nil, password: nil , logger: nil)
+      server = CouchParty::Server.new(url: url, name: name, password: password ,logger: logger)
+      server.db(db: db)
     end
 
     def get(url:)

@@ -34,10 +34,10 @@ server = CouchParty.new(url: 'http://server:5984', name: name, password: passwor
 server = CouchParty.new(url: 'name:password@http://server:5984')           # basic http auth
 db = server.db('testdb')  # select a database
 partition = db.partition('partid')  # get a partition from the database
-json = {"selector" => {"content" => {"$eq" => 'hello'}}}
-query = part.find(json: json)
+body = {"selector" => {"content" => {"$eq" => 'hello'}}}
+query = part.find(body)
 or
-query = db.find(json: json)
+query = db.find(body)
 
 # Save a document, with ID
 db.save_doc('_id' => 'doc', 'name' => 'test', 'date' => Date.current)

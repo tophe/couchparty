@@ -54,7 +54,7 @@ describe CouchParty::Database do
     it "should find via mango docs" do
       json = {"selector" => {"idcustomerfollow" => {"$eq" => 368636735}}}
       # p db.find(body: body)
-      expect(db.find(json: json).has_key?('docs')).to be_truthy
+      expect(db.find(json).has_key?('docs')).to be_truthy
     end
 
 

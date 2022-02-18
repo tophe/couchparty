@@ -50,7 +50,7 @@ module CouchParty
 
       it "should find via mango docs" do
         json = {"selector" => {"content" => {"$eq" => the_doc['truc']}}}
-        query = part.find(json: json)
+        query = part.find(json)
         expect(query.has_key?('docs')).to be_truthy
       end
 
@@ -69,7 +69,7 @@ module CouchParty
         expect(ret["result"]).to eq('created')
 
         json = {"selector" => {"content" => {"$eq" => the_doc[:content]}}}
-        query = part.find(json: json)
+        query = part.find(json)
         expect(query['docs'].size).to eq(1)
         expect(query['docs'].first['_id']).to eq(docid)
       end
