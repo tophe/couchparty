@@ -11,13 +11,16 @@ module CouchParty
       @logger = logger
 
       @session = HTTPX.plugin(:persistent)
-                      .with_headers("content-type" => "application/json")
-                      .with_headers("Accept" => "application/json")
-                      .with_headers("User-Agent" => "CouchParty/#{CouchParty::VERSION}")
-      # debug purpose
-                      .plugin(:proxy).with_proxy(uri: 'http://localhost:8888')
+                      .with_headers('content-type' => 'application/json')
+                      .with_headers('Accept' => 'application/json')
+                      .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
+
+      # debug purpose, set up a local proxy, ex: charles
+      # https://www.charlesproxy.com/
+      @session = @session.plugin(:proxy).with_proxy(uri: 'http://localhost:8888') if ENV['COUCHPARTY_PROXY']
+
       if ENV.has_key?('HTTP_PROXY')
-          @session = @session.plugin(:proxy).with_proxy(uri: ENV['HTTP_PROXY'])
+        @session = @session.plugin(:proxy).with_proxy(uri: ENV['HTTP_PROXY'])
       end
 
       # basic auth deprecated for cookie auth
@@ -42,15 +45,15 @@ module CouchParty
     end
 
     def clear_auth
-      resp = process(method: :delete, uri: @uri + "_session")
+      resp = process(method: :delete, uri: @uri + '_session')
     end
 
     # cookie auth
     def auth
-      resp = process(method: :post, uri: @uri + "_session", json: @auth_h)
+      resp = process(method: :post, uri: @uri + '_session', json: @auth_h)
       if resp.status == 200
         result = JSON.parse(resp.body.to_s)
-        if result["ok"] == true
+        if result['ok'] == true
           puts "auth success #{resp.headers["set-cookie"]}" if ENV['COUCHPARTY_DEBUG']
           log(:info, "authent success #{resp.headers["set-cookie"]}")
           # succeed
@@ -79,21 +82,21 @@ module CouchParty
         options[opt] = true if options.has_key?(opt)
       end
 
-      process_query(method: :put, uri: @uri + "/" + db, options: options )
+      process_query(method: :put, uri: @uri + '/' + db, options: options )
     end
 
     # delete database
     def delete(db: )
-      status, response = process_query_with_status(method: :delete, uri: @uri + "/" + db  )
+      status, response = process_query_with_status(method: :delete, uri: @uri + '/' + db  )
       raise response.error if response.status >= 500
     end
 
     def uuids
-      process_query(method: :get, uri: @uri + "/_uuids"  )
+      process_query(method: :get, uri: @uri + '/_uuids'  )
     end
 
     def active_tasks
-      process_query(method: :get, uri: @uri + "/_active_tasks"  )
+      process_query(method: :get, uri: @uri + '/_active_tasks'  )
     end
 
     def db(db: )
@@ -106,11 +109,11 @@ module CouchParty
 
     # Lists all databases on the server
     def all_dbs
-      process_query(method: :get, uri: @uri + "/_all_dbs" )
+      process_query(method: :get, uri: @uri + '/_all_dbs' )
     end
 
     def info
-      process_query(method: :get, uri: @uri + "/" )
+      process_query(method: :get, uri: @uri + '/' )
     end
 
 
@@ -155,7 +158,7 @@ module CouchParty
 
       puri = URI(uri.to_s)
 
-      query_str = options.collect { |name, value| "#{name}=#{value}"}.join("&")
+      query_str = options.collect { |name, value| "#{name}=#{value}"}.join('&')
       unless query_str.empty?
         if puri.query
           puri.query += '&' + query_str
@@ -174,7 +177,7 @@ module CouchParty
 
       # must reauth in case 401, and cookie auth
       if ret.status == 401 && cookie_auth?
-        puts "cookie timed out ! reauth and retry" if ENV['COUCHPARTY_DEBUG']
+        puts 'cookie timed out ! reauth and retry' if ENV['COUCHPARTY_DEBUG']
 
         auth
         if [:put, :post].include?(method)
@@ -191,7 +194,7 @@ module CouchParty
 
     def prepare_uri(url)
       uri = URI(url)
-      uri.path     = ""
+      uri.path     = ''
       uri.query    = nil
       uri.fragment = nil
       uri
