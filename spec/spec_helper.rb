@@ -12,13 +12,15 @@ unless defined?(FIXTURE_PATH)
   FIXTURE_PATH = File.join(File.dirname(__FILE__), '/fixtures')
   SCRATCH_PATH = File.join(File.dirname(__FILE__), '/tmp')
 
+  AUTH = {'COUCHDB_USER' => 'admin', 'COUCHDB_PASSWORD' => 'mysecretpassword'}
   # read authent attributes from docker/.env
-  AUTH = {}
-  File.open('./docker/.env').each do |line|
-    line.strip!
-    next if line.empty?
-    att, value = line.split('=')
-    AUTH[att] = value
+  if File.exist?('./docker/.env')
+    File.open('./docker/.env').each do |line|
+      line.strip!
+      next if line.empty?
+      att, value = line.split('=')
+      AUTH[att] = value
+    end
   end
 
   COUCHHOST = ENV['COUCHHOST'] || "http://#{AUTH["COUCHDB_USER"]}:#{AUTH["COUCHDB_PASSWORD"]}@localhost:5984"

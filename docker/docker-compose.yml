@@ -10,8 +10,6 @@ services:
       - TZ=Europe/Paris
       - COUCHDB_USER=${COUCHDB_USER}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
-    #      - CONTEXT_PATH=<URL_BASE> #optional
-    #      - JAVA_OPTS=<options> #optional
     volumes:
       - ./data:/opt/couchdb/data
     ports:

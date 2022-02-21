@@ -1,6 +1,6 @@
-# couchparty : Couchdb ruby driver
+# couchparty : modern ruby Couchdb driver
 
-CouchParty is a thin ruby driver for couchdb. It target ruby-3+ and couchdb v3+. It is greatly inspired by couchRest, but it is
+CouchParty is a modern ruby driver for couchdb. It target ruby-3+ and couchdb v3+. It is greatly inspired by couchRest, but it is
 simpler. It use ruby HTTPX, so every connection use http keepalive, it can easily support http/2 thank's HTTPX.
 The api is almost compatible with couchRest, but it is not a dropping, you have to adapt some code.
 ## what's new
@@ -30,7 +30,7 @@ gem 'couchparty', git: 'https://github.com/tophe/couchparty'
 # usage
 ```ruby
 server = CouchParty.new()           # assumes localhost by default!
-server = CouchParty.new(url: 'http://server:5984', name: name, password: password)           # cookie authent
+server = CouchParty.new(url: 'http://server:5984', name: name, password: password)           # cookie authent (more performant than basic auth)
 server = CouchParty.new(url: 'name:password@http://server:5984')           # basic http auth
 db = server.db('testdb')  # select a database
 partition = db.partition('partid')  # get a partition from the database
@@ -78,10 +78,11 @@ status, changeds = process_query_with_status(method: :get, uri: db.uri + '_chang
 # specs
 
 The test need to start a local couchdb.
-you can use docker/docker-compose.yml. Start by create docker/.env with
+you can use docker/docker-compose.yml. You can create docker/.env with
 COUCHDB_USER=myuser
 COUCHDB_PASSWORD=mypass
-You can now docker-compose up -d and configure the db in single mode via http://localhost:5984/_utils.
+
+You can now docker-compose up -d, eventualy you can configure the db in single mode via http://localhost:5984/_utils, but this is not necessary.
 Eventually use ENV['COUCHHOST'] to set an alternative server.
 the test create and delete 2 databases.
 
@@ -100,7 +101,7 @@ bug, suggestion can be post on github repo.
 
 
 # inspiration
-https://github.com/cobot/couchrest
+https://github.com/couchrest/couchrest
 https://gitlab.com/honeyryderchuck/httpx
 https://docs.couchdb.org/en/stable/
 https://hexdocs.pm/couchdb/

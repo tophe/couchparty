@@ -70,16 +70,16 @@ module CouchParty
         uri = URI(COUCHHOST)
         nuri = uri.scheme + '://' + uri.host + ':' + uri.port.to_s + '/' + uri.path
         server = CouchParty.server(url: nuri, name: uri.user, password: uri.password)
-        expect(server.all_dbs.size).to eq(4)
+        expect(server.all_dbs.class).to eq(Array)
       end
 
       it "should reaut user if cookie timed out" do
         uri = URI(COUCHHOST)
         nuri = uri.scheme + '://' + uri.host + ':' + uri.port.to_s + '/' + uri.path
         server = CouchParty.server(url: nuri, name: uri.user, password: uri.password)
-        expect(server.all_dbs.size).to eq(4)
+        expect(server.all_dbs.class).to eq(Array)
         server.clear_auth
-        expect(server.all_dbs.size).to eq(4)
+        expect(server.all_dbs.class).to eq(Array)
       end
 
     end
