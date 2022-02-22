@@ -29,6 +29,7 @@ module CouchParty
       # not supported
       unallowed_options = %w'attachments'
 
+      options ||= {}
       options = JSON.parse(options.to_json)
 
       options.keys.each do |option|
@@ -71,6 +72,7 @@ module CouchParty
     def  fetch_attachment(docid, attname, options: {})
       allowed_options = %w'rev'
 
+      options ||= {}
       options = JSON.parse(options.to_json)
 
       options.keys.each do |option|
@@ -91,6 +93,7 @@ module CouchParty
     def  fetch_attachment!(docid, attname, options: {})
       allowed_options = %w'rev'
 
+      options ||= {}
       options = JSON.parse(options.to_json)
 
       options.keys.each do |option|
@@ -114,6 +117,7 @@ module CouchParty
     def bulk_docs(docs, options: {})
       allowed_options = %w'new_edits'
 
+      options ||= {}
       options = JSON.parse(options.to_json)
 
       options.keys.each do |option|

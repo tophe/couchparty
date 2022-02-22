@@ -14,6 +14,7 @@ module CouchParty
                       .with_headers('content-type' => 'application/json')
                       .with_headers('Accept' => 'application/json')
                       .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
+                      .with(resolver_class: :system)
 
       # debug purpose, set up a local proxy, ex: charles
       # https://www.charlesproxy.com/
@@ -51,6 +52,9 @@ module CouchParty
     # cookie auth
     def auth
       resp = process(method: :post, uri: @uri + '_session', json: @auth_h)
+      raise "Error #{resp.error.message}" if resp.is_a?(HTTPX::ErrorResponse)
+
+
       if resp.status == 200
         result = JSON.parse(resp.body.to_s)
         if result['ok'] == true
@@ -133,6 +137,7 @@ module CouchParty
 
       response = process(method: method, uri: uri, options: options, body: body, headers: headers, json:json)
 
+
       #raise response.error if response.status >= 300
       raise CouchError.new(response.error) if response.status >= 300
 
@@ -141,6 +146,7 @@ module CouchParty
       else
         JSON.parse(response.to_s)
       end
+
 
     end
 
@@ -189,6 +195,7 @@ module CouchParty
       end
 
       log(:info, "#{method}\t#{uri}\t#{options}\tin #{((Time.now - start_time)*1000).round(3)} ms")
+      raise "Error #{ret.error.message}" if ret.is_a?(HTTPX::ErrorResponse)
       ret
     end
 

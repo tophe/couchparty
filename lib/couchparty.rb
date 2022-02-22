@@ -40,6 +40,7 @@ module CouchParty
       uri.password = nil
       server_url =  uri.to_s
 
+
       db(url: server_url, db: db, name: name, password: password, logger: logger)
     end
 

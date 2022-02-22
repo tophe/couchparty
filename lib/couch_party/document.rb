@@ -105,6 +105,7 @@ module CouchParty
       new!
       raise "Attachment #{name} not found" unless _attachments.has_key?(name)
       allowed_options = %w'rev'
+      options ||= {}
       options.keys.each do |option|
         raise "Error option : #{option} not allowed in get" unless allowed_options.include?(option)
       end
@@ -128,6 +129,7 @@ module CouchParty
     # put an attachment from a file, the file extension is used to find the mime-type
     def put_attachment(name, file, options: {}, reload: true)
       new!
+      options ||= {}
 
       content_type = mime_for(file)
       headers = {'If-Match': _rev, 'Content-Type': content_type}
