@@ -26,7 +26,24 @@ module CouchParty
       CouchParty::Server.new(url: url, name: name, password: password ,logger: logger)
     end
 
-    def database(url: , db:, name: nil, password: nil , logger: nil)
+    # couchrest compatibility
+    def database(url, logger: nil)
+      uri = URI(url)
+
+
+      db = uri.path[1..-1]
+      raise "Error url, database not specified" if db.empty?
+      uri.path = ''
+      name = uri.user
+      uri.user = nil
+      password = uri.password
+      uri.password = nil
+      server_url =  uri.to_s
+
+      db(url: server_url, db: db, name: name, password: password, logger: logger)
+    end
+
+    def db(url: , db:, name: nil, password: nil , logger: nil)
       server = CouchParty::Server.new(url: url, name: name, password: password ,logger: logger)
       server.db(db: db)
     end

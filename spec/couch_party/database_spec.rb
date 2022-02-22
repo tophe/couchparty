@@ -60,6 +60,17 @@ describe CouchParty::Database do
 
   end
 
+  describe :compatibility do
+    it 'should return db' do
+      db = CouchParty.database(COUCHHOST + '/' + TESTDB_PART)
+      expect(db.class).to be(Database)
+    end
+    it 'should raise is db is missing' do
+      expect {  CouchParty.database(COUCHHOST + '/' )}.to raise_error(RuntimeError)
+    end
+
+  end
+
   describe :docs do
     it "should return doc if exist" do
 

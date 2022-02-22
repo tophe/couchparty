@@ -29,6 +29,8 @@ gem 'couchparty', git: 'https://github.com/tophe/couchparty'
 
 # usage
 ```ruby
+require 'couchparty'
+
 server = CouchParty.new()           # assumes localhost by default!
 server = CouchParty.new(url: 'http://server:5984', name: name, password: password)           # cookie authent (more performant than basic auth)
 server = CouchParty.new(url: 'name:password@http://server:5984')           # basic http auth
