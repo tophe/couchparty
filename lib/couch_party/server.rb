@@ -86,7 +86,12 @@ module CouchParty
         options[opt] = true if options.has_key?(opt)
       end
 
-      process_query(method: :put, uri: @uri + '/' + db, options: options )
+      ret = process_query(method: :put, uri: @uri + '/' + db, options: options )
+
+      if ret['ok'] == true
+        return Database.new(server: self, db: db)
+      end
+
     end
 
     # delete database
