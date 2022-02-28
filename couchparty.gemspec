@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.name        = 'couchparty'
   s.version     = CouchParty::VERSION
   #s.date        = '2022-02-01'
-  s.date = File.mtime('VERSION')
+  s.date = File.mtime('lib/couch_party/version.rb')
 
   s.summary     = "couchparty : thin and modern couchdb driver for ruby"
   s.description = "couchparty is a couchdb driver that target couchdb 3+ and ruby 3+"
