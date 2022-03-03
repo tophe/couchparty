@@ -10,7 +10,6 @@ Gem::Specification.new do |s|
   s.summary     = "couchparty : thin and modern couchdb driver for ruby"
   s.description = "couchparty is a couchdb driver that target couchdb 3+ and ruby 3+"
   s.authors     = ["Christophe Vigny"]
-  s.homepage = %q{http://github.com/tophe/couchparty}
   s.homepage    =   'https://github.com/tophe/couchparty'
   s.license = 'MIT'
 

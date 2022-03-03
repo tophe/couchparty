@@ -31,15 +31,29 @@ gem 'couchparty', git: 'https://github.com/tophe/couchparty'
 ```ruby
 require 'couchparty'
 
-server = CouchParty.new()           # assumes localhost by default!
-server = CouchParty.new(url: 'http://server:5984', name: name, password: password)           # cookie authent (more performant than basic auth)
-server = CouchParty.new(url: 'name:password@http://server:5984')           # basic http auth
+server = CouchParty.server()           # assumes localhost by default!
+server = CouchParty.server(url: 'http://server:5984', name: name, password: password)           # cookie authent (more performant than basic auth)
+server = CouchParty.server(url: 'http://name:password@server:5984')           # basic http auth
+
 db = server.db('testdb')  # select a database
+
+# direct db, use server auth
+db = CouchParty.db(url: 'http://server:5984', name: name, password: password)
+
+# couchRest compatible mode use cookie auth
+db = CouchParty.database('thttp://name:password@server:5984/db')
+
 partition = db.partition('partid')  # get a partition from the database
+
 body = {"selector" => {"content" => {"$eq" => 'hello'}}}
-query = part.find(body)
-or
+query = partition.find(body)
+# or find an db
 query = db.find(body)
+
+# all_docs
+query = partition.all_docs(body)
+query = db.all_docs(body)
+
 
 # Save a document, with ID
 db.save_doc('_id' => 'doc', 'name' => 'test', 'date' => Date.current)
