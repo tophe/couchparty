@@ -7,6 +7,7 @@ module CouchParty
     attr_reader :session, :uri, :logger
 
     def initialize(url: 'http://localhost:5984', name: nil, password: nil, logger: nil, options: {})
+      puts "CouchParty debug mode on"  if ENV['COUCHPARTY_DEBUG']
       @uri = prepare_uri(url).freeze
       @logger = logger
 

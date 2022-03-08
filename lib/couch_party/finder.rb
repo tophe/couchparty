@@ -5,6 +5,17 @@ module CouchParty
 
     # get _all_docs
     def all_docs(options: {})
+      allowed_options = %w'conflicts descending endkey end_key endkey_docid end_key_doc_id group group_level include_docs att_encoding_info
+                        inclusive_end key keys limit reduce skip sorted stable stale startkey start_key startkey_docid start_key_doc_id update update_seq'
+
+      # not supported
+      unallowed_options = %w'attachments'
+
+      options = JSON.parse(options.to_json)
+      options.keys.each do |option|
+        raise "Error option : #{option} not allowed in view query" unless allowed_options.include?(option)
+      end
+
       @server.process_query(method: :get, uri: uri + '_all_docs', options: options )
     end
 

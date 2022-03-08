@@ -204,10 +204,6 @@ module CouchParty
       index.keys.each do |option|
         raise "Error option : #{option} not allowed in get" unless allowed_options.include?(option)
       end
-      # truethy
-      %w'partitioned'.each do |opt|
-        index[opt] = true if index.has_key?(opt)
-      end
 
       @server.process_query(method: :post, uri: uri + '_index', json: index)
 
