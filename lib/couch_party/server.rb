@@ -109,8 +109,14 @@ module CouchParty
       process_query(method: :get, uri: @uri + '/_active_tasks'  )
     end
 
+    def exist?(db:)
+      status, repsonce =  process_query_with_status(method: :head, uri: @uri + db  )
+      return false if status == 404
+      return true
+    end
+
     def db(db: )
-      if all_dbs.include?(db)
+      if exist?(db: db)
         return Database.new(server: self, db: db)
       else
         raise "database: #{db} not found"
