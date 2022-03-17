@@ -19,6 +19,17 @@ module CouchParty
     end
 
 
+    # read database security
+    def get_security
+      @server.process_query(method: :get, uri: uri + '/_security' )
+    end
+
+    # set database security
+    # ex:
+    # security_hash = {"admins": { "names": [], "roles": ["_admin"] }, "members": { "names": [], "roles": ["_admin"] } }
+    def set_security(security_hash: {"admins": { "names": [], "roles": [] }, "members": { "names": [], "roles": [] } })
+      @server.process_query(method: :put, uri: uri + '/_security', json: security_hash)
+    end
 
 
 
