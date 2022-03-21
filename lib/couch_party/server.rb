@@ -15,9 +15,10 @@ module CouchParty
                       .with_headers('content-type' => 'application/json')
                       .with_headers('Accept' => 'application/json')
                       .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
+                      .with(resolver_class: :system)
 
       # warning don't user the system resolver, the session crash after some queries.
-      #.with(resolver_class: :system)
+
 
       # debug purpose, set up a local proxy, ex: charles
       # https://www.charlesproxy.com/

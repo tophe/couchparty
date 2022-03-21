@@ -27,8 +27,20 @@ module CouchParty
       json.each_key do |k|
         raise "selector : #{k} not permited " unless body_params.include?(k)
       end
+      query = @server.process_query(method: :post, uri: uri + '_find', options: options, json: json)
+      ndocs = []
+      query['docs'].each do |doc|
 
-      @server.process_query(method: :post, uri: uri + '_find', options: options, json: json)
+        if self.is_a?(Partition)
+          ndocs << Document.new(doc, partition: self)
+        else
+          ndocs << Document.new(doc, db: self)
+        end
+
+
+      end
+      query['docs'] = ndocs
+      query
     end
 
 

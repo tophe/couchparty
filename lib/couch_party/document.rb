@@ -1,7 +1,11 @@
 module CouchParty
 
-  # a Couchdb Doc
-  # couchdb data is in doc attribut
+  # a Couchdb Doc, linked to db and partition
+  # couchdb attributes is in doc attribut
+  # usage:
+  # doc._id
+  # doc._rev
+  # doc.doc['content']
   class Document
 
     attr_reader :db, :partition, :_attachments, :_id, :_rev, :doc
