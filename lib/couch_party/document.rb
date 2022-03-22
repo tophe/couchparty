@@ -69,6 +69,14 @@ module CouchParty
       end
     end
 
+    # update doc content, except _id, _rev
+    def update_doc(doc)
+      doc = JSON.parse(doc.to_json)
+      doc.delete('_id')
+      doc.delete('_rev')
+      @doc.merge!(doc)
+    end
+
     def to_json(args = nil)
       @doc.to_json
     end

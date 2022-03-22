@@ -53,6 +53,15 @@ describe CouchParty::Document do
         TEST_SERVER.db(db: TESTDB).save_doc(the_doc)
 
       end
+      it 'should update' do
+
+        doc = db.get(docid)
+        doc.update_doc({content: 'bla', other: 'other'})
+
+        expect(doc.doc.keys.include?('other')).to be_truthy
+        expect(doc.doc['content']).to eq('bla')
+      end
+
   end
 
   describe :attachements do

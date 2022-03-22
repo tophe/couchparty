@@ -145,7 +145,6 @@ module CouchParty
     # if no _id in doc, the uuid if inserted from _uuids
     def save_doc(doc, batch: nil)
 
-
       unless doc.is_a?(Document)
         doc =  Document.new(doc, db: self)
       end
