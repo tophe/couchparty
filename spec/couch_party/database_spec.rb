@@ -52,9 +52,32 @@ describe CouchParty::Database do
     end
 
     it "should find via mango docs" do
-      json = {"selector" => {"idcustomerfollow" => {"$eq" => 368636735}}}
-      # p db.find(body: body)
-      expect(db.find(json).has_key?('docs')).to be_truthy
+      TEST_SERVER.db(db: TESTDB).save_doc( { _id: 'mg', content: 'find_mango'})
+
+
+      index =  '{
+          "index": {
+            "fields": ["content"]
+          },
+          "name" : "foo-index",
+          "type" : "json",
+          "partitioned" : false
+        }'
+
+      index = JSON.parse(index)
+      ret =  db.create_index(index)
+
+      json = {"selector" => {"content" => {"$eq" => 'find_mango'}}}
+      query = db.find(json)
+      expect(query.has_key?('docs')).to be_truthy
+
+      expect(query['docs'].size).to eq(1)
+      doc = query['docs'].first
+      expect(doc.class).to eq(Document)
+      expect(doc.doc['content']).to eq('find_mango')
+      del = doc.delete
+      expect(del["ok"]).to be_truthy
+
     end
 
 
@@ -250,10 +273,10 @@ describe CouchParty::Database do
   #   puts "after each"
   # end
 
-  after :all do
-    # puts "after all"
-
-    TEST_SERVER.delete(db: TESTDB)
-  end
+  # after :all do
+  #   # puts "after all"
+  #
+  #   TEST_SERVER.delete(db: TESTDB)
+  # end
 end
 end

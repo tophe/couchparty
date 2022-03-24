@@ -55,6 +55,8 @@ module CouchParty
       end
 
       it "should find via mango docs with index" do
+        TEST_SERVER.db(db: TESTDB_PART).save_doc( { _id: '1:mg', content: 'find_mango'})
+
         index =  '{
           "index": {
             "fields": ["content"]
@@ -68,10 +70,16 @@ module CouchParty
         ret =  db.create_index(index)
         expect(ret["result"]).to eq('created')
 
-        json = {"selector" => {"content" => {"$eq" => the_doc[:content]}}}
+        json = {"selector" => {"content" => {"$eq" => 'find_mango'}}}
         query = part.find(json)
         expect(query['docs'].size).to eq(1)
-        expect(query['docs'].first['_id']).to eq(docid)
+        doc = query['docs'].first
+
+        expect(doc.class).to eq(Document)
+        expect(doc.send(:_id)).to eq('1:mg')
+        del = doc.delete
+        expect(del['ok']).to be_truthy
+
       end
 
 

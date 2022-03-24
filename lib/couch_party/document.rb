@@ -1,7 +1,11 @@
 module CouchParty
 
-  # a Couchdb Doc
-  # couchdb data is in doc attribut
+  # a Couchdb Doc, linked to db and partition
+  # couchdb attributes is in doc attribut
+  # usage:
+  # doc._id
+  # doc._rev
+  # doc.doc['content']
   class Document
 
     attr_reader :db, :partition, :_attachments, :_id, :_rev, :doc
@@ -63,6 +67,14 @@ module CouchParty
       else
         {}
       end
+    end
+
+    # update doc content, except _id, _rev
+    def update_doc(doc)
+      doc = JSON.parse(doc.to_json)
+      doc.delete('_id')
+      doc.delete('_rev')
+      @doc.merge!(doc)
     end
 
     def to_json(args = nil)

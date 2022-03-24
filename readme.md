@@ -52,8 +52,8 @@ query = partition.find(body)
 query = db.find(body)
 
 # all_docs
-query = partition.all_docs(body)
-query = db.all_docs(body)
+query = partition.all_docs(options)
+query = db.all_docs(options)
 
 
 # Save a document, with ID
