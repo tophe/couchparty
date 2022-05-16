@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   # s.test_files = Dir.glob('spec/*.*')
   s.extra_rdoc_files = ['readme.md']
 
-  s.add_runtime_dependency "httpx"
+  s.add_runtime_dependency "http-cookie"
   s.add_runtime_dependency "mime-types"
 
   s.add_development_dependency "bundler", "~> 2.2"

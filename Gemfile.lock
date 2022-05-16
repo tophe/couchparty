@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     couchparty (0.5.0)
-      httpx
+      http-cookie
       mime-types
 
 GEM
@@ -13,10 +13,11 @@ GEM
     crack (0.4.5)
       rexml
     diff-lcs (1.5.0)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
     hashdiff (1.0.1)
-    http-2-next (0.5.0)
-    httpx (0.19.4)
-      http-2-next (>= 0.4.1)
+    http-cookie (1.0.4)
+      domain_name (~> 0.5)
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2022.0105)
@@ -36,6 +37,9 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.11.0)
     rspec-support (3.11.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.8.1)
     webmock (3.14.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
