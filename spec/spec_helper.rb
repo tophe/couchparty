@@ -27,6 +27,7 @@ unless defined?(FIXTURE_PATH)
   TESTDB    = 'couchparty-test'
   TESTDB_PART    = 'couchparty-test-part'
   REPLICATIONDB = 'couchparty-test-replication'
+  # TEST_SERVER    = CouchParty.server(url: COUCHHOST, options: {gzip: true})
   TEST_SERVER    = CouchParty.server(url: COUCHHOST)
 
 end

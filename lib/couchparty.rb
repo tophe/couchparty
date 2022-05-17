@@ -5,6 +5,7 @@ Bundler.require(:default)
 require 'http-cookie'
 require 'mime/types'
 require 'net/http'
+require 'zlib'
 
 require 'couch_party/version'
 require 'couch_party/server'
@@ -24,8 +25,8 @@ module CouchParty
 
 
     # Instantiate a new Server object
-    def server(url:, name: nil, password: nil , logger: nil)
-      CouchParty::Server.new(url: url, name: name, password: password ,logger: logger)
+    def server(url:, name: nil, password: nil , logger: nil, options: {})
+      CouchParty::Server.new(url: url, name: name, password: password ,logger: logger, options: options)
     end
 
     # couchrest compatibility

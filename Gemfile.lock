@@ -51,6 +51,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2.2)
   couchparty!
+  mime-types
   rake (< 11.0)
   rspec
   webmock

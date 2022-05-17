@@ -44,6 +44,10 @@ module CouchParty
         puts "proxy set to #{ENV["http_proxy"]}" if ENV["http_proxy"]
       end
 
+      if options.has_key?(:gzip)
+        @gzip = true
+      end
+
       @uri = prepare_uri(url).freeze
       @logger = logger
 
@@ -51,9 +55,9 @@ module CouchParty
 
       @request_headers =   {'content-type' => 'application/json',
                             'Accept' => 'application/json',
-                            'User-Agent' => "#{CouchParty::VERSION}"}
+                            'User-Agent' => "CouchParty-#{CouchParty::VERSION}"}
 
-
+      @request_headers['Content-Encoding'] = "gzip" if @gzip
 
 
       # @session = HTTPX.plugin(:persistent)
@@ -61,8 +65,8 @@ module CouchParty
       #                 .with_headers('Accept' => 'application/json')
       #                 .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
       #                 .with(resolver_class: :system)
-      # @session = Net::HTTP.start(@uri.host, @uri.port, "localhost", 8888, use_ssl: uri.scheme == 'https')
-      @session = Net::HTTP.start(@uri.host, @uri.port, use_ssl: uri.scheme == 'https')
+      @session = Net::HTTP.start(@uri.host, @uri.port, "localhost", 8888, use_ssl: uri.scheme == 'https')
+      #@session = Net::HTTP.start(@uri.host, @uri.port, use_ssl: uri.scheme == 'https')
 
       # warning don't user the system resolver, the session crash after some queries.
 
@@ -244,6 +248,15 @@ module CouchParty
       else
         content = json.to_json
       end
+
+      if content && @gzip
+
+        @gziper = Zlib::GzipWriter.new(StringIO.new)
+        @gziper.puts content.to_json
+        # @gziper << content.to_json
+        content = @gziper.close.string
+      end
+
       if [:put, :post].include?(method)
         response = @session.request(request, content)
       else
