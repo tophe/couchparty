@@ -1,7 +1,8 @@
 require "bundler/setup"
 Bundler.require(:default)
 
-require 'httpx'
+# require 'httpx'
+require 'http-cookie'
 require 'mime/types'
 
 require 'couch_party/version'

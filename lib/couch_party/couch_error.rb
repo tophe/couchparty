@@ -7,7 +7,8 @@ module CouchParty
     attr_reader :status
     # doc, change ruby symbol to string
     def initialize(httperr)
-      @status = httperr.status
+      p httperr
+      @status = httperr.code
       super(httperr.message)
 
     end

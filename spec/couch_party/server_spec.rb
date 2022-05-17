@@ -6,7 +6,7 @@ module CouchParty
       CouchParty.server(url: COUCHHOST)
     end
     before :all do
-      TEST_SERVER.delete(db: TESTDB)
+      # TEST_SERVER.delete(db: TESTDB)
       TEST_SERVER.create(db: TESTDB)
       doc = { _id: 'bob', content: 'truc'}
       TEST_SERVER.db(db: TESTDB).save_doc(doc)

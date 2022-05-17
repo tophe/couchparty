@@ -6,38 +6,78 @@ module CouchParty
     # Connection object prepared on initialization
     attr_reader :session, :uri, :logger
 
+    def request_factory(type, url, headers)
+
+      case type
+      when :get
+        request = Net::HTTP::Get.new url
+      when :post
+        request = Net::HTTP::Post.new url
+      when :put
+        request = Net::HTTP::Put.new url
+      when :head
+        request = Net::HTTP::Head.new url
+      when :delete
+        request = Net::HTTP::Delete.new url
+      end
+
+
+      @request_headers.each do |header, value|
+        request[header] = value
+      end
+      headers.each do |header, value|
+        request[header] = value
+      end
+
+      request.basic_auth @basic_auth[:user], @basic_auth[:password] if @basic_auth
+
+
+
+      request['Cookie'] = HTTP::Cookie.cookie_value(@jar.cookies(url))
+
+      request
+    end
+
     def initialize(url: 'http://localhost:5984', name: nil, password: nil, logger: nil, options: {})
       puts "CouchParty debug mode on"  if ENV['COUCHPARTY_DEBUG']
       @uri = prepare_uri(url).freeze
       @logger = logger
 
-      @session = HTTPX.plugin(:persistent)
-                      .with_headers('content-type' => 'application/json')
-                      .with_headers('Accept' => 'application/json')
-                      .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
-                      .with(resolver_class: :system)
+      @jar = HTTP::CookieJar.new
+
+      @request_headers =   {'content-type' => 'application/json',
+                            'Accept' => 'application/json',
+                            'User-Agent' => "#{CouchParty::VERSION}"}
+
+
+      # @session = HTTPX.plugin(:persistent)
+      #                 .with_headers('content-type' => 'application/json')
+      #                 .with_headers('Accept' => 'application/json')
+      #                 .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
+      #                 .with(resolver_class: :system)
+      @session = Net::HTTP.start(@uri.host, @uri.port, use_ssl: uri.scheme == 'https')
 
       # warning don't user the system resolver, the session crash after some queries.
 
 
       # debug purpose, set up a local proxy, ex: charles
       # https://www.charlesproxy.com/
-      @session = @session.plugin(:proxy).with_proxy(uri: 'http://localhost:8888') if ENV['COUCHPARTY_PROXY']
+      # @session = @session.plugin(:proxy).with_proxy(uri: 'http://localhost:8888') if ENV['COUCHPARTY_PROXY']
 
-      if ENV.has_key?('HTTP_PROXY')
-        @session = @session.plugin(:proxy).with_proxy(uri: ENV['HTTP_PROXY'])
-      end
+      # if ENV.has_key?('HTTP_PROXY')
+      #   @session = @session.plugin(:proxy).with_proxy(uri: ENV['HTTP_PROXY'])
+      # end
+
+
 
       # basic auth deprecated for cookie auth
       unless @uri.user.nil?
-        @session = @session
-                        .plugin(:basic_authentication)
-                        .basic_auth(@uri.user, @uri.password)
+        @basic_auth = {user: @uri.user, password: @uri.password}
       end
 
+      # cookie auth
       unless name.nil?
-        @auth_h = {name: name, password:  password }
-        @session = @session.plugin(:cookies)
+        @cookie_auth = {name: name, password:  password }
         auth
 
       end
@@ -46,7 +86,7 @@ module CouchParty
 
     # true if using a cookie auth
     def cookie_auth?
-      @auth_h.nil? ? false : true
+      @cookie_auth.nil? ? false : true
     end
 
     def clear_auth
@@ -55,15 +95,18 @@ module CouchParty
 
     # cookie auth
     def auth
-      resp = process(method: :post, uri: @uri + '_session', json: @auth_h)
-      raise "Error #{resp.error.message}" if resp.is_a?(HTTPX::ErrorResponse)
+      resp = process(method: :post, uri: @uri + '_session', json: @cookie_auth)
+      raise "Error #{resp.error.message}" if resp.code.to_i >= 500
 
 
-      if resp.status == 200
+      if resp.code.to_i == 200
         result = JSON.parse(resp.body.to_s)
         if result['ok'] == true
-          puts "auth success #{resp.headers["set-cookie"]}" if ENV['COUCHPARTY_DEBUG']
-          log(:info, "authent success #{resp.headers["set-cookie"]}")
+          resp.get_fields('Set-Cookie').each do |value|
+            @jar.parse(value, @uri)
+          end
+          puts "auth success #{resp.get_fields('Set-Cookie')}" if ENV['COUCHPARTY_DEBUG']
+          log(:info, "authent success #{resp.get_fields('Set-Cookie')}")
           # succeed
           # httpx manage the cookie
         end
@@ -101,7 +144,7 @@ module CouchParty
     # delete database
     def delete(db: )
       status, response = process_query_with_status(method: :delete, uri: @uri + '/' + db  )
-      raise response.error if response.status >= 500
+      raise response.message if response.code.to_i >= 500
     end
 
     def uuids
@@ -145,7 +188,7 @@ module CouchParty
     def process_query_with_status(method:, uri:, options: {}, body: nil, headers: {}, json: nil, no_json: false)
       response = process(method: method, uri: uri, options: options, body: body, json: json)
 
-      [response.status, response]
+      [response.code.to_i, response]
     end
 
     def process_query(method:, uri:, options: {}, body: nil, headers: {}, json: nil, no_json: false)
@@ -153,13 +196,12 @@ module CouchParty
       response = process(method: method, uri: uri, options: options, body: body, headers: headers, json:json)
 
 
-      #raise response.error if response.status >= 300
-      raise CouchError.new(response.error) if response.status >= 300
+      raise CouchError.new(response) if response.code.to_i >= 300
 
       if no_json
         response.body
       else
-        JSON.parse(response.to_s)
+        JSON.parse(response.body)
       end
 
 
@@ -190,28 +232,37 @@ module CouchParty
 
       # puts uri
       start_time = Time.now
-      if [:put, :post].include?(method)
-        ret = @session.send(method, puri, body: body, headers: headers, json: json)
+
+      request = request_factory(method,  puri, headers)
+
+      if body
+        content = body
       else
-        ret = @session.send(method, puri, headers: headers)
+        content = json.to_json
+      end
+      if [:put, :post].include?(method)
+        response = @session.request(request, content)
+      else
+        response = @session.request(request)
       end
 
+
       # must reauth in case 401, and cookie auth
-      if ret.status == 401 && cookie_auth?
+      if response.code.to_i == 401 && cookie_auth?
         puts 'cookie timed out ! reauth and retry' if ENV['COUCHPARTY_DEBUG']
 
         auth
         if [:put, :post].include?(method)
-          ret = @session.send(method, puri, body: body, headers: headers, json: json)
+          response = @session.request(request, content)
         else
-          ret = @session.send(method, puri, headers: headers)
+          response = @session.request(request)
         end
 
       end
 
       log(:info, "#{method}\t#{uri}\t#{options}\tin #{((Time.now - start_time)*1000).round(3)} ms")
-      raise "Error #{ret.error.message}" if ret.is_a?(HTTPX::ErrorResponse)
-      ret
+      raise "Error #{response.message}" if response.code.to_i >= 500
+      response
     end
 
     def prepare_uri(url)

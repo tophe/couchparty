@@ -264,7 +264,7 @@ describe CouchParty::Database do
       begin
         db.fetch_attachment!(docid, 'moon')
       rescue CouchError => e
-        expect(e.status).to eq(404)
+        expect(e.status.to_i).to eq(404)
       end
 
     end
