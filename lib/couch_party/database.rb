@@ -123,17 +123,38 @@ module CouchParty
       uri
     end
 
-    # docs : array of simple {} or Document, in a {} need _id and _rev if an update is needed.
+    # docs : array of simple {} or Document, in a {} need id and rev if an update is needed.
+    # docs = [{"id": "bla"},{"id": "bob", "rev": "4-sfs"}]
     # return couch response
-    def bulk_docs(docs, options: {})
-      allowed_options = %w'new_edits'
+    def bulk_get(docs)
+      # allowed_options = %w'new_edits'
 
       options ||= {}
       options = JSON.parse(options.to_json)
 
-      options.keys.each do |option|
-        raise "Error option : #{option} not allowed in buld_docs" unless allowed_options.include?(option)
-      end
+      docs = JSON.parse(docs.to_json)
+
+      # options.keys.each do |option|
+      #   raise "Error option : #{option} not allowed in buld_docs" unless allowed_options.include?(option)
+      # end
+      docs = {'docs' => docs}
+      @server.process_query(method: :post, uri: uri + '_bulk_get', options: options, json: docs)
+
+    end
+
+    # docs :list of document object need _id and _rev
+    # update or create the docs
+    def bulk_docs(docs)
+      # allowed_options = %w'new_edits'
+
+      options ||= {}
+      options = JSON.parse(options.to_json)
+
+      docs = JSON.parse(docs.to_json)
+
+      # options.keys.each do |option|
+      #   raise "Error option : #{option} not allowed in buld_docs" unless allowed_options.include?(option)
+      # end
       docs = {'docs' => docs}
       @server.process_query(method: :post, uri: uri + '_bulk_docs', options: options, json: docs)
 
