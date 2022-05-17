@@ -4,6 +4,7 @@ Bundler.require(:default)
 # require 'httpx'
 require 'http-cookie'
 require 'mime/types'
+require 'net/http'
 
 require 'couch_party/version'
 require 'couch_party/server'

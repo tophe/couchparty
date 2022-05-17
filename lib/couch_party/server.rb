@@ -39,7 +39,11 @@ module CouchParty
     end
 
     def initialize(url: 'http://localhost:5984', name: nil, password: nil, logger: nil, options: {})
-      puts "CouchParty debug mode on"  if ENV['COUCHPARTY_DEBUG']
+      if ENV['COUCHPARTY_DEBUG']
+        puts "CouchParty debug mode on"
+        puts "proxy set to #{ENV["http_proxy"]}" if ENV["http_proxy"]
+      end
+
       @uri = prepare_uri(url).freeze
       @logger = logger
 
@@ -50,11 +54,14 @@ module CouchParty
                             'User-Agent' => "#{CouchParty::VERSION}"}
 
 
+
+
       # @session = HTTPX.plugin(:persistent)
       #                 .with_headers('content-type' => 'application/json')
       #                 .with_headers('Accept' => 'application/json')
       #                 .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
       #                 .with(resolver_class: :system)
+      # @session = Net::HTTP.start(@uri.host, @uri.port, "localhost", 8888, use_ssl: uri.scheme == 'https')
       @session = Net::HTTP.start(@uri.host, @uri.port, use_ssl: uri.scheme == 'https')
 
       # warning don't user the system resolver, the session crash after some queries.
@@ -98,7 +105,6 @@ module CouchParty
       resp = process(method: :post, uri: @uri + '_session', json: @cookie_auth)
       raise "Error #{resp.error.message}" if resp.code.to_i >= 500
 
-
       if resp.code.to_i == 200
         result = JSON.parse(resp.body.to_s)
         if result['ok'] == true
@@ -110,8 +116,6 @@ module CouchParty
           # succeed
           # httpx manage the cookie
         end
-
-
       else
         raise CouchError.new(resp.error)
       end
@@ -252,17 +256,16 @@ module CouchParty
         puts 'cookie timed out ! reauth and retry' if ENV['COUCHPARTY_DEBUG']
 
         auth
-        if [:put, :post].include?(method)
-          response = @session.request(request, content)
-        else
-          response = @session.request(request)
-        end
+
+        process(method: method, uri: uri, options: options, body: body, headers: headers, json: json)
+
+      else
+        log(:info, "#{method}\t#{uri}\t#{options}\tin #{((Time.now - start_time)*1000).round(3)} ms")
+        raise "Error #{response.message}" if response.code.to_i >= 500
+        response
 
       end
 
-      log(:info, "#{method}\t#{uri}\t#{options}\tin #{((Time.now - start_time)*1000).round(3)} ms")
-      raise "Error #{response.message}" if response.code.to_i >= 500
-      response
     end
 
     def prepare_uri(url)
