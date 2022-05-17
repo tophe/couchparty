@@ -25,7 +25,8 @@ server    = CouchParty.server(url: COUCHHOST, logger: logger)
 # install
 gem install couchparty
 or
-gem 'couchparty', git: 'https://github.com/tophe/couchparty'
+gem 'couchparty', git: 'https://github.com/tophe/couchparty', branch: 'main'
+
 
 # usage
 ```ruby
