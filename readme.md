@@ -4,7 +4,7 @@ CouchParty is a modern ruby driver for couchdb. It target ruby-3+ and couchdb v3
 simpler. It use ruby HTTPX, so every connection use http keepalive, it can easily support http/2 thank's HTTPX.
 The api is almost compatible with couchRest, but it is not a dropping, you have to adapt some code.
 ## what's new
-- use HTTPX
+- use net/http
 - support for partitioned databases
 - support for mango query
 - support ruby 3.1
