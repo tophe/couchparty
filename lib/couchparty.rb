@@ -25,8 +25,8 @@ module CouchParty
 
 
     # Instantiate a new Server object
-    def server(url:, name: nil, password: nil , logger: nil, options: {})
-      CouchParty::Server.new(url: url, name: name, password: password ,logger: logger, options: options)
+    def server(url:, name: nil, password: nil , logger: nil, gzip: false, proxy_host: nil, proxy_port: nil, read_timeout: 60)
+      CouchParty::Server.new(url: url, name: name, password: password ,logger: logger, gzip: gzip, proxy_host: proxy_host, proxy_port: proxy_port, read_timeout: read_timeout)
     end
 
     # couchrest compatibility
@@ -47,8 +47,8 @@ module CouchParty
       db(url: server_url, db: db, name: name, password: password, logger: logger)
     end
 
-    def db(url: , db:, name: nil, password: nil , logger: nil)
-      server = CouchParty::Server.new(url: url, name: name, password: password ,logger: logger)
+    def db(url: , db:, name: nil, password: nil , logger: nil, gzip: false, proxy_host: nil, proxy_port: nil, read_timeout: 60)
+      server = CouchParty::Server.new(url: url, name: name, password: password ,logger: logger, gzip: gzip, proxy_host: proxy_host, proxy_port: proxy_port, read_timeout: read_timeout)
       server.db(db: db)
     end
 

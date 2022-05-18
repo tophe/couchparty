@@ -38,15 +38,21 @@ module CouchParty
       request
     end
 
-    def initialize(url: 'http://localhost:5984', name: nil, password: nil, logger: nil, options: {})
+    # create a new server
+    # from url
+    # name: user name
+    # password: password
+    # setting name and password use couchdb session authentication
+    # logger: set a ruby logger
+    # options: gzip: true, proxy_host, proxy_port, http_timeout
+    # option
+    def initialize(url: 'http://localhost:5984', name: nil, password: nil, logger: nil, gzip: false, proxy_host: nil, proxy_port: nil, read_timeout: 60 )
       if ENV['COUCHPARTY_DEBUG']
         puts "CouchParty debug mode on"
         puts "proxy set to #{ENV["http_proxy"]}" if ENV["http_proxy"]
       end
 
-      if options.has_key?(:gzip)
-        @gzip = true
-      end
+      @gzip = false
 
       @uri = prepare_uri(url).freeze
       @logger = logger
@@ -59,27 +65,19 @@ module CouchParty
 
       @request_headers['Content-Encoding'] = "gzip" if @gzip
 
+      if proxy_host & proxy_port
+        @proxy_host = proxy_host
+        @proxy_port = proxy_port
+      end
+      @read_timeout = read_timeout
 
-      # @session = HTTPX.plugin(:persistent)
-      #                 .with_headers('content-type' => 'application/json')
-      #                 .with_headers('Accept' => 'application/json')
-      #                 .with_headers('User-Agent' => "CouchParty/#{CouchParty::VERSION}")
-      #                 .with(resolver_class: :system)
-      @session = Net::HTTP.start(@uri.host, @uri.port, "localhost", 8888, use_ssl: uri.scheme == 'https')
-      #@session = Net::HTTP.start(@uri.host, @uri.port, use_ssl: uri.scheme == 'https')
+      ENV.delete("http_proxy")
 
-      # warning don't user the system resolver, the session crash after some queries.
-
-
-      # debug purpose, set up a local proxy, ex: charles
-      # https://www.charlesproxy.com/
-      # @session = @session.plugin(:proxy).with_proxy(uri: 'http://localhost:8888') if ENV['COUCHPARTY_PROXY']
-
-      # if ENV.has_key?('HTTP_PROXY')
-      #   @session = @session.plugin(:proxy).with_proxy(uri: ENV['HTTP_PROXY'])
-      # end
-
-
+      if @proxy_host
+        @session = Net::HTTP.start(@uri.host, @uri.port, @proxy_host, @proxy_port, use_ssl: uri.scheme == 'https')
+      else
+        @session = Net::HTTP.start(@uri.host, @uri.port, use_ssl: uri.scheme == 'https', read_timeout: @read_timeout)
+      end
 
       # basic auth deprecated for cookie auth
       unless @uri.user.nil?
@@ -238,6 +236,7 @@ module CouchParty
         end
       end
 
+
       # puts uri
       start_time = Time.now
 
@@ -251,11 +250,19 @@ module CouchParty
 
       if content && @gzip
 
-        @gziper = Zlib::GzipWriter.new(StringIO.new)
-        @gziper.puts content.to_json
-        # @gziper << content.to_json
+        # write content to a file need to use tempfile
+        File.open('json.json','w') { |io| io.puts(json.to_json)}
+
+        # read content in bin mode
+        content_bin= File.new('json.json','rb').read
+        sio = StringIO.new
+        sio.binmode
+        @gziper = Zlib::GzipWriter.new(sio)
+        #@gziper.write r
+        @gziper << content_bin
         content = @gziper.close.string
       end
+
 
       if [:put, :post].include?(method)
         response = @session.request(request, content)

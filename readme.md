@@ -114,11 +114,40 @@ COUCHPARTY_DEBUG=1 rspec
 # Contact
 bug, suggestion can be post on github repo.
 
+# problem
+gzip support, doesn't work, it need to write file to gzip data, because of the ruby string support.
+```ruby
+content = {"_id"=>"bob", "content"=>"truc"}
+3.1.0 :074 > sjson = content.to_json
+=> "{\"_id\":\"bob\",\"content\":\"truc\"}"
+sio = StringIO.new
+sio.binmode # don't help
+sio.write sjson
+sio.string
+=> "{\"_id\":\"bob\",\"content\":\"truc\"}"
+```
+sio.string should be  => "{"_id":"bob","content":"truc"}" to be valid couch json.
+so we need to do
+```ruby
+      if content && @gzip
 
+        # write content to a file need to use tempfile
+        File.open('json.json','w') { |io| io.puts(json.to_json)}
+
+        # read content in bin mode
+        content_bin= File.new('json.json','rb').read
+        sio = StringIO.new
+        sio.binmode
+        @gziper = Zlib::GzipWriter.new(sio)
+        @gziper.write content_bin
+        content = @gziper.close.string
+      end
+```
+content must be serialize and read from a real file, because a simple @gziper.write content.to_json don't work
+without workaround, I have disable gzip support.
 
 
 # inspiration
-https://github.com/couchrest/couchrest
-https://gitlab.com/honeyryderchuck/httpx
-https://docs.couchdb.org/en/stable/
-https://hexdocs.pm/couchdb/
+https://github.com/couchrest/couchrest  
+https://docs.couchdb.org/en/stable/  
+https://hexdocs.pm/couchdb/  
