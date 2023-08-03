@@ -13,7 +13,7 @@ module CouchParty
       @content = content
       @doc = doc
 
-      check_md5! if @doc
+#      check_md5! if @doc
     end
 
     def loaded?
@@ -24,7 +24,7 @@ module CouchParty
     def check_md5!
       return unless loaded?
       digest = 'md5-' + Digest::MD5.base64digest(@content)
-      raise 'content md5 invalid ' if digest != @attachment['digest']
+      raise "content md5 invalid found #{digest} != #{@attachment['digest']}" if digest != @attachment['digest']
     end
 
     # save attachment to file
