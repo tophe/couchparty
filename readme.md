@@ -42,7 +42,7 @@ db = server.db('testdb')  # select a database
 db = CouchParty.db(url: 'http://server:5984', name: name, password: password)
 
 # couchRest compatible mode use cookie auth
-db = CouchParty.database('thttp://name:password@server:5984/db')
+db = CouchParty.database('http://name:password@server:5984/db')
 
 partition = db.partition('partid')  # get a partition from the database
 
@@ -57,7 +57,7 @@ query = db.all_docs(options)
 
 
 # Save a document, with ID
-db.save_doc('_id' => 'doc', 'name' => 'test', 'date' => Date.current)
+db.save_doc({'_id' => 'doc', 'name' => 'test', 'date' => Date.current})
 
 # Fetch doc
 doc = db.get('doc')
@@ -72,6 +72,9 @@ doc.delete
 doc.put_attachment('moon', 'file.jpg')
 attachment = doc.fetch_attachment('moon')
 attachment.save('my_file')
+
+# or without loading doc
+db.save_attachment({_id: 27}, 'moon', my_file)
 
 # no consistency / presence check !
 db.fetch_attachment(docid, name, options: {rev: 'cx'})

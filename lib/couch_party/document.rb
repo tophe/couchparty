@@ -143,7 +143,7 @@ module CouchParty
       new!
       options ||= {}
 
-      content_type = mime_for(file)
+      content_type = db.mime_for(file)
       headers = {'If-Match': _rev, 'Content-Type': content_type}
       resp = db.server.process_query(method: :put, uri: db.uri + "/" + _id +  '/' + name , body: File.read(file), headers: headers )
       raise "Error puting attachment #{name}" unless resp['ok']==true

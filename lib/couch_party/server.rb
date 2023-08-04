@@ -214,6 +214,7 @@ module CouchParty
     end
 
 
+
     # central method for acting on couch
     # method: http method (:get, :put ...)
     # uri: http uri
