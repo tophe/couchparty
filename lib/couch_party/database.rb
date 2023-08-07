@@ -138,6 +138,10 @@ module CouchParty
       attachment
     end
 
+    # compact database
+    def compact!()
+        @server.process_query(method: :post, uri: uri + "/_compact"   )
+    end
 
     def to_s
       uri
