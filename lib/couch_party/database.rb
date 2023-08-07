@@ -101,6 +101,26 @@ module CouchParty
     end
 
     #  GET /{db}/{docid}/{attname}
+    def  present_attachment?(docid, attname, options: {})
+      allowed_options = %w'rev'
+
+      options ||= {}
+      options = JSON.parse(options.to_json)
+
+      options.keys.each do |option|
+        raise "Error option : #{option} not allowed in fetch_attachment" unless allowed_options.include?(option)
+      end
+
+      status, content = @server.process_query_with_status(method: :head, uri: uri + "/" +docid +  '/' + attname , options: options , no_json: true)
+
+      if status == 200
+        return true
+      else
+        return nil
+      end
+    end
+
+    #  GET /{db}/{docid}/{attname}
     def  fetch_attachment!(docid, attname, options: {})
       allowed_options = %w'rev'
 

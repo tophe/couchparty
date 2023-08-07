@@ -76,6 +76,9 @@ attachment.save('my_file')
 # or without loading doc
 db.save_attachment({_id: 27}, 'moon', my_file)
 
+# present
+db.present_attachment(27, 'moon')
+
 # no consistency / presence check !
 db.fetch_attachment(docid, name, options: {rev: 'cx'})
 
