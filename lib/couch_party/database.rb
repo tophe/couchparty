@@ -229,14 +229,21 @@ module CouchParty
 
     # saving attachments, without loading doc.
     # doc: with _id, name: attacment name, file: attachment source, mime type from the file.
-    def save_attachments(doc, name, file, options: {})
+    def save_attachments(doc, name, file: '', content_type: '', stream: nil,  options: {})
       unless doc.is_a?(Document)
         doc =  Document.new(doc, db: self)
       end
 
-      content_type = mime_for(file)
+      unless file.empty?
+        content_type = mime_for(file)
+        data = File.read(file)
+      else
+        raise "stream and file cannot be all nul" if stream.nil?
+        data = stream
+      end
+
       headers = {'If-Match': doc._rev, 'Content-Type': content_type}
-      resp = @server.process_query(method: :put, uri: uri + "/" + doc._id +  '/' + name , body: File.read(file), headers: headers )
+      resp = @server.process_query(method: :put, uri: uri + "/" + doc._id +  '/' + name , body: data, headers: headers )
       raise "Error puting attachment #{name}" unless resp['ok']==true
 
     end

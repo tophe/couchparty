@@ -74,7 +74,10 @@ attachment = doc.fetch_attachment('moon')
 attachment.save('my_file')
 
 # or without loading doc
-db.save_attachment({_id: 27}, 'moon', my_file)
+db.save_attachment({_id: 27}, 'moon', file: my_file)
+
+# from stream
+db.save_attachment({_id: 27}, 'moon', stream: my_stream, content_type: 'text/plain')
 
 # present
 db.present_attachment(27, 'moon')
